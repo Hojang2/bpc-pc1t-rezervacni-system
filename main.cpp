@@ -2,6 +2,7 @@
 //
 
 #include "main.h"
+#include "zpracovani_kinosalu.h"
 
 using namespace std;
 
@@ -9,10 +10,10 @@ int main()
 {
 	const int POCET_FILMU = 5;
 	const int POCET_CASU = 5;
+	char* cesta_k_souboru = "sal_1.txt";
 	int t = 3;
 	int f;
 	int c;
-	
 	char filmy[POCET_FILMU][20] = { "james bond", "avatar", "ready player one", "star wars", "duna" };
 	char casy[POCET_CASU][20] = { "9:00 - 11:00", "11:00 - 13:00", "13:00 - 15:00", "15:00 - 17:00", "17:00 - 19:00" };
 	
@@ -43,6 +44,53 @@ int main()
 				printf("Spatne vybrany cas \n");
 				continue;
 			}
+
+			sal sal1 = { 0 };
+			sal pole = nacteni_kinosalu(cesta_k_souboru, sal1);
+
+			for (int i = 0; i < 8; i++)
+			{
+				printf(" %s\n", pole.line[i]);
+			}
+			printf("\n");
+
+			int sedadel;
+			
+			printf("Zadej pocet sedadel:");
+			scanf("%d", &sedadel);
+			printf("\n");
+
+			//int sedadla[sedadel];
+			int** sedadla = new int* [sedadel];
+			
+			int x, y;
+			int i = 0;
+			int souradnice[2];
+			while (i < sedadel) {
+				printf("Zadej radu a cislo sedadla ve formatu [rada sedadlo]:");
+				scanf("%d %d", &x, &y);
+
+				if (pole.line[x][y] != 'X') {
+					sedadla[i] = souradnice;
+					sedadla[i][0] = x;
+					sedadla[i][1] = y;
+					pole.line[x][y] = 'X';
+					i++;
+				}
+			}
+			for (int i = 0; i < 8; i++)
+			{
+				printf(" %s\n", pole.line[i]);
+			}
+			printf("\n");
+			
+			
+			
+
+			
+			
+			
+			
 			t = 3;
 		}
 		if (t == 2) {

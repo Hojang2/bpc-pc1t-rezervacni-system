@@ -14,7 +14,18 @@ int najdi_volnou_vstupenku(int vstupenky[LSIZ * RSIZ][5]) {
 		}
 	}
 }
+soubor zmena_hodnoty(soubor pole, int f) {
+	char nova_hodnota[LSIZ];
+	scanf("%s", &nova_hodnota);
+	int delka = sizeof(nova_hodnota);
 
+	if (delka > 0) {
+		for (int i = 0; i < LSIZ; i++) {
+			pole.line[f][i] = nova_hodnota[i];
+		}
+	}
+	return pole;
+}
 void vypsani_salu(soubor pole) {
 	for (int i = 0; i < 8; i++)
 	{
@@ -51,7 +62,7 @@ void vypis_vstupenky(int vstupenky[LSIZ * RSIZ][5], int vstupenka, soubor filmy,
 	int cas;
 	int neexistuje = 1;
 	for (int i = 0; i < RSIZ * LSIZ; i++) {
-		if (vstupenky[i][0] == vstupenka) {
+		if (vstupenky[i][0] == vstupenka && vstupenka != 0) {
 			printf("*************************************************\n");
 			printf("Vstupenka cislo: %d Pro radu: %d sedadlo: %d \n", vstupenky[i][0], vstupenky[i][1], vstupenky[i][2]);
 			film = vstupenky[i][3];
@@ -64,6 +75,14 @@ void vypis_vstupenky(int vstupenky[LSIZ * RSIZ][5], int vstupenka, soubor filmy,
 	if (neexistuje) {
 		printf("Vstupenka cislo: %d neexistuje\n", vstupenka);
 	}
+}
+int potvrzeny_vyber() {
+	int zmena = 0;
+	printf("yes = 1\n");
+	printf("no = 0\n");
+	printf("Odpoved: ");
+	scanf("%d", &zmena);
+	return zmena;
 }
 
 int main()
@@ -153,13 +172,7 @@ int main()
 				}
 				
 			}
-			/*
-			for (int i = 0; i < sedadel; i++) {
-				if (sedadla[i][0]) {
-					printf("%d %d\n", sedadla[i][0], sedadla[i][1], sedadla[i][2]);
-				}
-			}
-			*/
+			
 			vypis_vstupenky(vstupenky, vstupenka, filmy, casy);
 			vypis_vstupenek(vstupenky);
 
@@ -189,6 +202,30 @@ int main()
 
 		}
 		else if (t == 3) {
+			f = vyber_filmu(filmy, POCET_FILMU);
+			printf("Zmenit nazev filmu?\n");
+			if (potvrzeny_vyber()) {
+				printf("\nZadej novy nazev filmu s podtrzitky misto mezer: ");
+				filmy = zmena_hodnoty(filmy, f);
+				printf("\nNabidka filmu: \n");
+				for (int i = 0; i < POCET_FILMU; i++) {
+					printf("Film cislo %d: %s\n", i, filmy.line[i]);
+				}
+			}
+			printf("Zmenit cas filmu?\n");
+			for (int i = 0; i < POCET_CASU; i++) {
+				printf("Cas cislo %d: %s\n", i, casy.line[i]);
+			}
+			if (potvrzeny_vyber()) {
+				printf("\nZadej novy cas filmu ve formatu [hh:mm-hh:mm]: ");
+				casy = zmena_hodnoty(casy, f);
+				printf("\nNabidka casu: \n");
+				for (int i = 0; i < POCET_CASU; i++) {
+					printf("Cas cislo %d: %s\n", i, casy.line[i]);
+				}
+			}
+
+			t = 4;
 			
 
 		} else {
@@ -201,6 +238,7 @@ int main()
 			scanf_s("%d", &t);
 		}
 	}
+	printf("Ukladam zmeny\n");
 	ulozeni_souboru("sal_1.txt", pole);
 	ulozeni_souboru("filmy.txt", filmy);
 	ulozeni_souboru("casy.txt", casy);

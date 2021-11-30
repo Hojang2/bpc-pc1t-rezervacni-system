@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define LSIZ 40
 #define RSIZ 8 
 
@@ -44,4 +47,21 @@ soubor nacteni_souboru(char* cesta_k_souboru, soubor x) {
 	}
 	
 	return x;
+}
+
+void ulozeni_souboru(char* cesta_k_souboru, soubor x) {
+	FILE* fptr = fopen(cesta_k_souboru, "w+");
+	if (fptr == NULL) {
+		printf("Chyba pri otevreni souboru.");
+		exit(1);
+	}
+
+	
+	for (int i = 0; i < RSIZ; i++) {
+		char result[LSIZ + 2];
+		strcpy(result, x.line[i]);
+		strcat(result, "\n");
+		fputs(result, fptr);
+	}
+	fclose(fptr);
 }

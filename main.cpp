@@ -6,14 +6,65 @@
 #include <time.h>
 
 using namespace std;
-int najdi_cislo_vstupenky(int vstupenky[LSIZ * RSIZ][3]) {
+
+int najdi_volnou_vstupenku(int vstupenky[LSIZ * RSIZ][5]) {
 	for (int i = 0; i < RSIZ * LSIZ; i++) {
 		if (vstupenky[i][0] == 0) {
 			return i;
 		}
 	}
 }
-	
+
+void vypsani_salu(soubor pole) {
+	for (int i = 0; i < 8; i++)
+	{
+		printf(" %s\n", pole.line[i]);
+	}
+	printf("\n");
+}
+void vypis_vstupenek(int vstupenky[LSIZ * RSIZ][5]) {
+	for (int i = 0; i < RSIZ * LSIZ; i++) {
+		if (vstupenky[i][0]) {
+			printf("%d %d %d \n", vstupenky[i][0], vstupenky[i][1], vstupenky[i][2]);
+		}
+	}
+}
+
+int vyber_filmu(soubor filmy, int filmu) {
+	int f = -1;
+
+	printf("\nNabidka filmu: \n");
+	for (int i = 0; i < filmu; i++) {
+		printf("Film cislo %d: %s\n", i, filmy.line[i]);
+	}
+
+	while (f < 0 || f > filmu - 1) {
+
+
+		printf("Vyber si cislo filmu: ");
+		scanf_s("%d", &f);
+	}
+	return f;
+}
+void vypis_vstupenky(int vstupenky[LSIZ * RSIZ][5], int vstupenka, soubor filmy, soubor casy) {
+	int film;
+	int cas;
+	int neexistuje = 1;
+	for (int i = 0; i < RSIZ * LSIZ; i++) {
+		if (vstupenky[i][0] == vstupenka) {
+			printf("*************************************************\n");
+			printf("Vstupenka cislo: %d Pro radu: %d sedadlo: %d \n", vstupenky[i][0], vstupenky[i][1], vstupenky[i][2]);
+			film = vstupenky[i][3];
+			cas= vstupenky[i][4];
+			printf("Pro film: %s v case %s\n", filmy.line[film], casy.line[cas]);
+			printf("*************************************************\n");
+			neexistuje = 0;
+		}
+	}
+	if (neexistuje) {
+		printf("Vstupenka cislo: %d neexistuje\n", vstupenka);
+	}
+}
 
 int main()
 {
@@ -22,15 +73,12 @@ int main()
 	char* cesta_k_salu = "sal_1.txt";
 	char* cesta_k_casum = "casy.txt";
 	char* cesta_k_filmum= "filmy.txt";
-	int t = 3;
+	int t = 4;
 	int f;
-	int c;
 	int vstupenka;
 	int cislo_vstupenky;
-	int vstupenky[LSIZ * RSIZ][3] = { 0 };
+	int vstupenky[LSIZ * RSIZ][5] = { 0 };
 	srand(time(NULL));
-	//char filmy[POCET_FILMU][20] = { "james bond", "avatar", "ready player one", "star wars", "duna" };
-	//char casy[POCET_CASU][20] = { "9:00 - 11:00", "11:00 - 13:00", "13:00 - 15:00", "15:00 - 17:00", "17:00 - 19:00" };
 	soubor sal1 = { 0 };
 	soubor pole = nacteni_souboru(cesta_k_salu, sal1);
 	soubor filmy = nacteni_souboru(cesta_k_filmum, sal1);
@@ -41,48 +89,20 @@ int main()
 	
 	while (t) {
 		if (t == 1) {
-			printf("\nNabidka filmu: \n");
-			for (int i = 0; i < POCET_FILMU; i++) {
-				printf("Film cislo %d: %s\n", i, filmy.line[i]);
-			}
 
-			printf("Vyber si cislo filmu: ");
-			scanf_s("%d", &f);
-			if (f < 0 || f > POCET_FILMU-1) {
-				printf("Spatne vybrany film \n");
-				continue;
-			}
+			f = vyber_filmu(filmy, POCET_FILMU);
 
 
-			printf("\nNabidka casu: \n");
-			for (int i = 0; i < POCET_CASU; i++) {
-				printf("Cas cislo %d: %s\n", i, casy.line[i]);
-			}
-
-			printf("Vyber si cislo casu filmu: ");
-			scanf_s("%d", &c);
-
-			if (c < 0 || c > POCET_CASU-1) {
-				printf("Spatne vybrany cas \n");
-				continue;
-			}
-
-			
-
-			for (int i = 0; i < 8; i++)
-			{
-				printf(" %s\n", pole.line[i]);
-			}
-			printf("\n");
+			vypsani_salu(pole);
 
 
-			
+			int sedadla[RSIZ * LSIZ][3];
+
 			printf("Zadej pocet sedadel:");
 			scanf("%d", &sedadel);
 			printf("\n");
 
-			//int sedadla[sedadel];
-			int sedadla[RSIZ * LSIZ][3];
+			
 			
 			if (sedadel <= 0) {
 				continue;
@@ -103,11 +123,7 @@ int main()
 					}
 				}
 			}
-			for (int i = 0; i < 8; i++)
-			{
-				printf(" %s\n", pole.line[i]);
-			}
-			printf("\n");
+			vypsani_salu(pole);
 
 			orig = 1;
 			while (1){
@@ -121,53 +137,73 @@ int main()
 					break;
 				}
 			}
-			cislo_vstupenky = najdi_cislo_vstupenky(vstupenky);
+			cislo_vstupenky = najdi_volnou_vstupenku(vstupenky);
 			
 			for (int i = 0; i < sedadel; i++) {
 				if (sedadla[i][0]) {
 					vstupenky[cislo_vstupenky][0] = vstupenka;
 					vstupenky[cislo_vstupenky][1] = sedadla[i][1];
 					vstupenky[cislo_vstupenky][2] = sedadla[i][2];
+					vstupenky[cislo_vstupenky][3] = f;
+					vstupenky[cislo_vstupenky][4] = f;
 					if (vstupenky[cislo_vstupenky + 1][0]) {
-						cislo_vstupenky = najdi_cislo_vstupenky(vstupenky);
+						cislo_vstupenky = najdi_volnou_vstupenku(vstupenky);
 					}
 					cislo_vstupenky++;
 				}
 				
 			}
+			/*
 			for (int i = 0; i < sedadel; i++) {
 				if (sedadla[i][0]) {
 					printf("%d %d\n", sedadla[i][0], sedadla[i][1], sedadla[i][2]);
 				}
 			}
+			*/
+			vypis_vstupenky(vstupenky, vstupenka, filmy, casy);
+			vypis_vstupenek(vstupenky);
 
+			t = 4;
+
+		} else if (t == 2) {
+			printf("Zadej cislo vstupenky: ");
+			scanf("%d", &vstupenka);
+			vypis_vstupenky(vstupenky, vstupenka, filmy, casy);
 			for (int i = 0; i < RSIZ * LSIZ; i++) {
-				if (vstupenky[i][0]) {
-					printf("%d %d %d \n", vstupenky[i][0], vstupenky[i][1], vstupenky[i][2]);
+				if (vstupenky[i][0] == vstupenka) {
+					x = vstupenky[i][1];
+					y = vstupenky[i][2];
+					pole.line[x][y] = '0';
+					vstupenky[i][0] = 0;
+					vstupenky[i][1] = 0;
+					vstupenky[i][2] = 0;
+					vstupenky[i][3] = 0;
+					vstupenky[i][4] = 0;
+					
 				}
+				
 			}
+			vypis_vstupenky(vstupenky, vstupenka, filmy, casy);
+			vypsani_salu(pole);
+			t = 4;
 
-			
-			
-			
-
-			
-			
-			
-			
-			t = 3;
 		}
-		if (t == 2) {
-			printf("Zadej kod vstupenky: ");
+		else if (t == 3) {
+			
+
 		} else {
 			printf("Zadejte cislo jedne z moznosti : \n");
 			printf("0. ukonceni programu \n");
 			printf("1. vyber filmu \n");
 			printf("2. zruseni vstupenky \n");
+			printf("3. zmena jmena nebo casu filmu \n");
 			printf("Zadej volbu: ");
 			scanf_s("%d", &t);
 		}
 	}
-		
+	ulozeni_souboru("sal_1.txt", pole);
+	ulozeni_souboru("filmy.txt", filmy);
+	ulozeni_souboru("casy.txt", casy);
+
 	return 0;
 }

@@ -30,9 +30,8 @@ soubor nacteni_souboru(char* cesta_k_souboru, soubor x) {
 
 	while (fgets(line[i], LSIZ, fptr))
 	{
-		if (i != RSIZ - 1) {
-			line[i][strlen(line[i]) - 1] = '\0';
-		}
+		line[i][strlen(line[i]) - 1] = '\0';
+		
 		i++;
 	}
 	fclose(fptr);
@@ -40,16 +39,18 @@ soubor nacteni_souboru(char* cesta_k_souboru, soubor x) {
 	tot = i;
 	for (i = 0; i < tot; i++)
 	{	
-		for (int ii = 0; ii < LSIZ; ii++) {
-			x.line[i][ii] = line[i][ii];
+		if(strlen(line[i]) > 0){
+			for (int ii = 0; ii < LSIZ; ii++) {
+				x.line[i][ii] = line[i][ii];
 			
+			}
 		}
 	}
 	
 	return x;
 }
 
-void ulozeni_souboru(char* cesta_k_souboru, soubor x) {
+void ulozeni_souboru(char* cesta_k_souboru, soubor x, int pocet_radku) {
 	FILE* fptr = fopen(cesta_k_souboru, "w+");
 	if (fptr == NULL) {
 		printf("Chyba pri otevreni souboru.");
@@ -57,11 +58,12 @@ void ulozeni_souboru(char* cesta_k_souboru, soubor x) {
 	}
 
 	
-	for (int i = 0; i < RSIZ; i++) {
-		char result[LSIZ + 2];
+	for (int i = 0; i < pocet_radku; i++) {
+		char result[LSIZ];
 		strcpy(result, x.line[i]);
 		strcat(result, "\n");
 		fputs(result, fptr);
+		
 	}
 	fclose(fptr);
 }

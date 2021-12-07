@@ -6,14 +6,15 @@
 #include <time.h>
 
 using namespace std;
-
-int najdi_volnou_vstupenku(int vstupenky[LSIZ * RSIZ][5]) {
+// funkce pro projiti veskerych vstupenek a najiti volneho mista pro novou vstupenku
+int najdi_volnou_vstupenku(int vstupenky[LSIZ * RSIZ][5]) { 
 	for (int i = 0; i < RSIZ * LSIZ; i++) {
 		if (vstupenky[i][0] == 0) {
 			return i;
 		}
 	}
 }
+// funkce pro zmenu radku v seznamu filmu/casu
 soubor zmena_hodnoty(soubor pole, int f) {
 	char pole2[LSIZ];
 	printf("Zadej novou hodnotu(musi byt 1 string): ");
@@ -27,6 +28,7 @@ soubor zmena_hodnoty(soubor pole, int f) {
 	}
 	return pole;
 }
+// vypsani 2D pole sal
 void vypsani_salu(soubor pole) {
 	for (int i = 0; i < 8; i++)
 	{
@@ -34,7 +36,7 @@ void vypsani_salu(soubor pole) {
 	}
 	printf("\n");
 }
-
+// vypis jedne konkretni vstupenky
 void vypis_vstupenky(int vstupenky[LSIZ * RSIZ][5], int vstupenka, soubor filmy, soubor casy) {
 	int film;
 	int cas;
@@ -54,15 +56,17 @@ void vypis_vstupenky(int vstupenky[LSIZ * RSIZ][5], int vstupenka, soubor filmy,
 		printf("Vstupenka cislo: %d neexistuje, nebo byla zrusena\n", vstupenka);
 	}
 }
-
+// prochazeni vsech vstupenek a zavolani funkce vypis_vstupenk pro kazdou vstupenku
 void vypis_vstupenek(int vstupenky[LSIZ * RSIZ][5], soubor filmy, soubor casy) {
+	int last = 0;
 	for (int i = 0; i < RSIZ * LSIZ; i++) {
-		if (vstupenky[i][0] && vstupenky[i][0] != 0) {
+		if (vstupenky[i][0] && vstupenky[i][0] != 0 && last != vstupenky[i][0]) {
+			last = vstupenky[i][0];
 			vypis_vstupenky(vstupenky, vstupenky[i][0], filmy, casy);
 		}
 	}
 }
-
+// funkce pro vypis filmu a vstup uzivatele s cislem filmu
 int vyber_filmu(soubor filmy, int filmu) {
 	int f = -1;
 
@@ -80,7 +84,7 @@ int vyber_filmu(soubor filmy, int filmu) {
 	}
 	return f;
 }
-
+// kontrola pred zmenou nazvu filmu/casu
 int potvrzeny_vyber(int zmena = 0) {
 	printf("yes = 1\n");
 	printf("no = 0\n");
@@ -92,17 +96,19 @@ int potvrzeny_vyber(int zmena = 0) {
 
 int main()
 {
-	const int POCET_FILMU = 5;
-	const int POCET_CASU = 5;
+	const int POCET_FILMU = 6; // pocet filmu v souboru 1 - 8
+	const int POCET_CASU = 5; // pocet casu v souboru 1 - 8
+	// definice cest k souborum
 	char* cesta_k_salu = "sal_1.txt";
 	char* cesta_k_casum = "casy.txt";
 	char* cesta_k_filmum= "filmy.txt";
-	int t = 4;
+	int t = 4; // promenna, ktera meni mod programu
 	int f;
 	int vstupenka;
 	int cislo_vstupenky;
-	int vstupenky[LSIZ * RSIZ][5] = { 0 };
-	srand(time(NULL));
+	int vstupenky[LSIZ * RSIZ][5] = { 0 }; // 2D pole, ktere obsahuje data o vstupenkach
+	srand(time(NULL)); // inicializace pro generovani nahodneho cisla
+	// nasteni obsahu souboru
 	soubor sal1 = { 0 };
 	soubor pole = nacteni_souboru(cesta_k_salu, sal1);
 	soubor filmy = nacteni_souboru(cesta_k_filmum, sal1);
@@ -111,7 +117,7 @@ int main()
 	int x, y, i, orig;
 	
 	
-	while (t) {
+	while (t) { // hlavni cyklus, bezi dokud uzivatel nezada 0
 		if (t == 1) {
 
 			f = vyber_filmu(filmy, POCET_FILMU);
@@ -120,7 +126,7 @@ int main()
 			vypsani_salu(pole);
 
 
-			int sedadla[RSIZ * LSIZ][3];
+			int sedadla[RSIZ * LSIZ][3]; // 2D pole, kam se budou ukladat pozice obsazenych sedadel
 
 			printf("Zadej pocet sedadel:");
 			scanf("%d", &sedadel);
@@ -136,7 +142,7 @@ int main()
 				printf("Zadej radu a cislo sedadla ve formatu [rada sedadlo]:");
 				scanf("%d %d", &x, &y);
 				while (getchar() != '\n');
-				if ((x >= 0 && x < 15) && (y >= 0 && y < 8)) {
+				if ((x >= 0 && x < 15) && (y >= 0 && y < 8)) { // zmena z 0 na X, v danem sedadle
 
 
 					if (pole.line[x][y] != 'X') {
@@ -152,8 +158,8 @@ int main()
 
 			orig = 1;
 			while (1){
-				vstupenka = rand();
-				for (int i = 0; i < RSIZ * LSIZ; i++) {
+				vstupenka = rand(); // generace nahodneho cisla
+				for (int i = 0; i < RSIZ * LSIZ; i++) { // kontrola unikatnosti vygenerovaneho cisla
 					if (vstupenka == vstupenky[i][0]) {
 						orig = 0;
 					}
@@ -162,7 +168,7 @@ int main()
 					break;
 				}
 			}
-			cislo_vstupenky = najdi_volnou_vstupenku(vstupenky);
+			cislo_vstupenky = najdi_volnou_vstupenku(vstupenky); // nalezeni pozice na vstupenku
 			
 			for (int i = 0; i < sedadel; i++) {
 				if (sedadla[i][0]) {
@@ -171,7 +177,7 @@ int main()
 					vstupenky[cislo_vstupenky][2] = sedadla[i][2];
 					vstupenky[cislo_vstupenky][3] = f;
 					vstupenky[cislo_vstupenky][4] = f;
-					if (vstupenky[cislo_vstupenky + 1][0]) {
+					if (vstupenky[cislo_vstupenky + 1][0]) { // pri obsazeni vice sedadel, vyhledani dalsi mozne vstupenky
 						cislo_vstupenky = najdi_volnou_vstupenku(vstupenky);
 					}
 					cislo_vstupenky++;
@@ -192,7 +198,7 @@ int main()
 			while (getchar() != '\n');
 
 			
-			for (int i = 0; i < RSIZ * LSIZ; i++) {
+			for (int i = 0; i < RSIZ * LSIZ; i++) { // vynulovani hodnot vstupenky
 				if (vstupenky[i][0] == vstupenka) {
 					x = vstupenky[i][1];
 					y = vstupenky[i][2];
@@ -239,7 +245,7 @@ int main()
 			
 
 		} else {
-			
+			// zakladni menu
 			printf("\nZadejte cislo jedne z moznosti : \n");
 			printf("0. ukonceni programu \n");
 			printf("1. vyber filmu \n");
@@ -251,6 +257,7 @@ int main()
 			system("cls");
 		}
 	}
+	// ulozeni zmen
 	printf("Ukladam zmeny\n");
 	ulozeni_souboru("sal_1.txt", pole, RSIZ);
 	ulozeni_souboru("filmy.txt", filmy, POCET_FILMU);

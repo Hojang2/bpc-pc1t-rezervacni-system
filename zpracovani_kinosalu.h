@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define LSIZ 40
-#define RSIZ 8 
+#define LSIZ 40 // definice promenne pro maximalni pocet znaku na radku
+#define RSIZ 8 // definice promenne pro maximalni pocet radku souboru
 
-typedef struct 
+typedef struct // definice struktury pro nacitani souboru
 {
 	char line[8][40];
 	
@@ -16,8 +16,8 @@ typedef struct
 
 
 soubor nacteni_souboru(char* cesta_k_souboru, soubor x) {
-	FILE* fptr = fopen(cesta_k_souboru, "rt");
-	if (fptr == NULL) {
+	FILE* fptr = fopen(cesta_k_souboru, "rt"); // otevreni souboru v modu cteni
+	if (fptr == NULL) { // zkouska, jestli se soubor povedlo otevrit
 		printf("Chyba pri otevreni souboru.");
 		exit(1);
 	}
@@ -28,16 +28,16 @@ soubor nacteni_souboru(char* cesta_k_souboru, soubor x) {
 	int i = 0;
 	int tot = 0;
 
-	while (fgets(line[i], LSIZ, fptr))
+	while (fgets(line[i], LSIZ, fptr)) // prendani hodnot z pointeru do 2D pole line
 	{
 		line[i][strlen(line[i]) - 1] = '\0';
 		
 		i++;
 	}
-	fclose(fptr);
+	fclose(fptr); // zavreni souboru
 	
 	tot = i;
-	for (i = 0; i < tot; i++)
+	for (i = 0; i < tot; i++) // predani hodnot z 2D pole line do struktury soubor
 	{	
 		if(strlen(line[i]) > 0){
 			for (int ii = 0; ii < LSIZ; ii++) {
@@ -51,7 +51,7 @@ soubor nacteni_souboru(char* cesta_k_souboru, soubor x) {
 }
 
 void ulozeni_souboru(char* cesta_k_souboru, soubor x, int pocet_radku) {
-	FILE* fptr = fopen(cesta_k_souboru, "w+");
+	FILE* fptr = fopen(cesta_k_souboru, "w+"); // otevreni souboru a smazani veskereho obsahu
 	if (fptr == NULL) {
 		printf("Chyba pri otevreni souboru.");
 		exit(1);
@@ -59,11 +59,12 @@ void ulozeni_souboru(char* cesta_k_souboru, soubor x, int pocet_radku) {
 
 	
 	for (int i = 0; i < pocet_radku; i++) {
+		// pridani konce radku k jednotlivim radkum
 		char result[LSIZ];
 		strcpy(result, x.line[i]);
 		strcat(result, "\n");
-		fputs(result, fptr);
+		fputs(result, fptr); // ulozeni radku
 		
 	}
-	fclose(fptr);
+	fclose(fptr); // ukonceni souboru
 }
